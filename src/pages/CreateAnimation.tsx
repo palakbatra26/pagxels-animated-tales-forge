@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,24 +13,53 @@ const CreateAnimation = () => {
   const [description, setDescription] = useState('');
   const [prompt, setPrompt] = useState('');
   const [loading, setLoading] = useState(false);
+  const [token, setToken] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  // Check if user is authenticated
+  useEffect(() => {
+    const storedToken = localStorage.getItem('token');
+    const storedUser = localStorage.getItem('user');
+    
+    if (storedToken && storedUser) {
+      setToken(storedToken);
+      try {
+        const user = JSON.parse(storedUser);
+        setUserId(user.id);
+      } catch (error) {
+        console.error('Failed to parse user data', error);
+        navigate('/signin');
+      }
+    } else {
+      navigate('/signin');
+    }
+  }, [navigate]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!token || !userId) {
+      toast({
+        variant: "destructive",
+        title: "Authentication Error",
+        description: "You must be logged in to create animations.",
+      });
+      navigate('/signin');
+      return;
+    }
+    
     setLoading(true);
 
     try {
-      // TODO: Replace with actual user ID from authentication
-      const userId = 'temp-user-id';
-      
       const animation = await api.createAnimation({
         title,
         description,
         prompt,
         userId,
         status: 'pending'
-      });
+      }, token);
 
       toast({
         title: "Success",
@@ -42,7 +72,7 @@ const CreateAnimation = () => {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to create animation. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to create animation.",
       });
     } finally {
       setLoading(false);
@@ -92,4 +122,4 @@ const CreateAnimation = () => {
   );
 };
 
-export default CreateAnimation; 
+export default CreateAnimation;
