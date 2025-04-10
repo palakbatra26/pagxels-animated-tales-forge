@@ -12,6 +12,25 @@ export interface Story {
   metadata: Record<string, any>;
 }
 
+export interface Animation {
+  _id: string;
+  title: string;
+  description: string;
+  prompt: string;
+  status: 'pending' | 'processing' | 'completed' | 'failed';
+  userId: string;
+  createdAt: string;
+  updatedAt: string;
+  animationUrl?: string;
+  thumbnailUrl?: string;
+  metadata?: {
+    duration?: number;
+    format?: string;
+    size?: number;
+    [key: string]: any;
+  };
+}
+
 export const api = {
   // Get all stories
   async getStories(): Promise<Story[]> {
@@ -68,6 +87,60 @@ export const api = {
     });
     if (!response.ok) {
       throw new Error('Failed to delete story');
+    }
+  },
+
+  // Animation-related functions
+  async getAnimations(): Promise<Animation[]> {
+    const response = await fetch(`${API_URL}/animations`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch animations');
+    }
+    return response.json();
+  },
+
+  async getAnimation(id: string): Promise<Animation> {
+    const response = await fetch(`${API_URL}/animations/${id}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch animation');
+    }
+    return response.json();
+  },
+
+  async createAnimation(animation: Omit<Animation, '_id' | 'createdAt' | 'updatedAt'>): Promise<Animation> {
+    const response = await fetch(`${API_URL}/animations`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(animation),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to create animation');
+    }
+    return response.json();
+  },
+
+  async updateAnimation(id: string, animation: Partial<Animation>): Promise<Animation> {
+    const response = await fetch(`${API_URL}/animations/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(animation),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to update animation');
+    }
+    return response.json();
+  },
+
+  async deleteAnimation(id: string): Promise<void> {
+    const response = await fetch(`${API_URL}/animations/${id}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) {
+      throw new Error('Failed to delete animation');
     }
   },
 }; 

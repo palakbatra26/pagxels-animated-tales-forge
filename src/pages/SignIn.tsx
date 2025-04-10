@@ -4,6 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
+import { Link } from 'react-router-dom';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
@@ -17,19 +20,35 @@ const SignIn = () => {
     setLoading(true);
 
     try {
-      // TODO: Implement actual sign-in logic
-      // For now, just simulate a successful sign-in
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const response = await fetch(`${API_URL}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to sign in');
+      }
+
+      // Store the token and user data
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+
       toast({
         title: "Success",
         description: "Signed in successfully",
       });
+
       navigate('/dashboard');
     } catch (error) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to sign in",
+        description: error instanceof Error ? error.message : "Failed to sign in",
       });
     } finally {
       setLoading(false);
@@ -48,6 +67,7 @@ const SignIn = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            placeholder="Enter your email"
           />
         </div>
         <div>
@@ -58,12 +78,19 @@ const SignIn = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            placeholder="Enter your password"
           />
         </div>
         <Button type="submit" className="w-full" disabled={loading}>
           {loading ? 'Signing in...' : 'Sign In'}
         </Button>
       </form>
+      <p className="mt-4 text-center text-sm text-gray-600">
+        Don't have an account?{' '}
+        <Link to="/register" className="text-pagxels-purple hover:underline">
+          Register here
+        </Link>
+      </p>
     </div>
   );
 };

@@ -5,10 +5,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
+import { api } from '@/lib/api';
 
 const CreateAnimation = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [prompt, setPrompt] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -18,19 +20,29 @@ const CreateAnimation = () => {
     setLoading(true);
 
     try {
-      // TODO: Implement actual animation creation logic
-      // For now, just simulate a successful creation
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // TODO: Replace with actual user ID from authentication
+      const userId = 'temp-user-id';
+      
+      const animation = await api.createAnimation({
+        title,
+        description,
+        prompt,
+        userId,
+        status: 'pending'
+      });
+
       toast({
         title: "Success",
-        description: "Animation created successfully",
+        description: "Animation created successfully! It will be processed shortly.",
       });
-      navigate('/dashboard');
+
+      // Navigate to the animation details page
+      navigate(`/animations/${animation._id}`);
     } catch (error) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to create animation",
+        description: "Failed to create animation. Please try again.",
       });
     } finally {
       setLoading(false);
@@ -48,6 +60,7 @@ const CreateAnimation = () => {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
+            placeholder="Enter animation title"
           />
         </div>
         <div>
@@ -57,6 +70,18 @@ const CreateAnimation = () => {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             required
+            placeholder="Describe your animation"
+          />
+        </div>
+        <div>
+          <Label htmlFor="prompt">Animation Prompt</Label>
+          <Textarea
+            id="prompt"
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            required
+            placeholder="Describe what you want to animate in detail"
+            className="min-h-[150px]"
           />
         </div>
         <Button type="submit" className="w-full" disabled={loading}>
