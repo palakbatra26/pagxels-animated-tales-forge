@@ -1,5 +1,5 @@
-
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 
 const HeroSection = () => {
@@ -18,12 +18,16 @@ const HeroSection = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <Button className="bg-gradient-to-r from-pagxels-purple to-pagxels-blue text-white px-8 py-6 h-auto text-lg">
-                Create Your Animation
-              </Button>
-              <Button variant="outline" className="px-8 py-6 h-auto text-lg">
-                View Examples
-              </Button>
+              <Link to="/create">
+                <Button className="bg-gradient-to-r from-pagxels-purple to-pagxels-blue text-white px-8 py-6 h-auto text-lg">
+                  Create Your Animation
+                </Button>
+              </Link>
+              <Link to="/stories">
+                <Button variant="outline" className="px-8 py-6 h-auto text-lg">
+                  View Examples
+                </Button>
+              </Link>
             </div>
           </div>
           
