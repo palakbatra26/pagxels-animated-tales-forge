@@ -9,6 +9,7 @@ import Index from './pages/Index';
 import NotFound from './pages/NotFound';
 import Stories from './components/Stories';
 import SignIn from './pages/SignIn';
+import Register from './pages/Register';
 import CreateAnimation from './pages/CreateAnimation';
 import Dashboard from './pages/Dashboard';
 
@@ -30,6 +31,7 @@ function App() {
                 <Route path="/" element={<Index />} />
                 <Route path="/stories" element={<Stories />} />
                 <Route path="/signin" element={<SignIn />} />
+                <Route path="/register" element={<Register />} />
                 <Route path="/create" element={<CreateAnimation />} />
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="*" element={<NotFound />} />

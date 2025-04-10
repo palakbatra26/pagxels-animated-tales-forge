@@ -6,7 +6,8 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { api } from '@/lib/api';
 
-const SignIn = () => {
+const Register = () => {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -18,7 +19,7 @@ const SignIn = () => {
     setLoading(true);
 
     try {
-      const data = await api.login(email, password);
+      const data = await api.register(name, email, password);
       
       // Store the token and user data
       localStorage.setItem('token', data.token);
@@ -26,7 +27,7 @@ const SignIn = () => {
 
       toast({
         title: "Success",
-        description: "Signed in successfully",
+        description: "Registered successfully",
       });
 
       navigate('/dashboard');
@@ -34,7 +35,7 @@ const SignIn = () => {
       toast({
         variant: "destructive",
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to sign in",
+        description: error instanceof Error ? error.message : "Failed to register",
       });
     } finally {
       setLoading(false);
@@ -43,8 +44,19 @@ const SignIn = () => {
 
   return (
     <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-6 text-center">Sign In</h2>
+      <h2 className="text-2xl font-bold mb-6 text-center">Register</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <Label htmlFor="name">Name</Label>
+          <Input
+            id="name"
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+            placeholder="Enter your name"
+          />
+        </div>
         <div>
           <Label htmlFor="email">Email</Label>
           <Input
@@ -68,17 +80,17 @@ const SignIn = () => {
           />
         </div>
         <Button type="submit" className="w-full" disabled={loading}>
-          {loading ? 'Signing in...' : 'Sign In'}
+          {loading ? 'Registering...' : 'Register'}
         </Button>
       </form>
       <p className="mt-4 text-center text-sm text-gray-600">
-        Don't have an account?{' '}
-        <Link to="/register" className="text-blue-600 hover:underline">
-          Register here
+        Already have an account?{' '}
+        <Link to="/signin" className="text-blue-600 hover:underline">
+          Sign in here
         </Link>
       </p>
     </div>
   );
 };
 
-export default SignIn; 
+export default Register; 

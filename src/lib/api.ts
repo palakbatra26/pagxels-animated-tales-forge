@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
 
 export interface Story {
   _id: string;
@@ -32,6 +32,37 @@ export interface Animation {
 }
 
 export const api = {
+  // Auth-related functions
+  async login(email: string, password: string) {
+    const response = await fetch(`${API_URL}/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to sign in');
+    }
+    return response.json();
+  },
+
+  async register(name: string, email: string, password: string) {
+    const response = await fetch(`${API_URL}/auth/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name, email, password }),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to register');
+    }
+    return response.json();
+  },
+
   // Get all stories
   async getStories(): Promise<Story[]> {
     const response = await fetch(`${API_URL}/stories`);
