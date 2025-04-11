@@ -43,6 +43,15 @@ export interface AuthResponse {
   };
 }
 
+// Helper function to handle API responses and errors
+const handleResponse = async (response: Response) => {
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.message || 'An error occurred with the request');
+  }
+  return response.json();
+};
+
 export const api = {
   // Auth-related functions
   async login(email: string, password: string): Promise<AuthResponse> {
@@ -53,11 +62,7 @@ export const api = {
       },
       body: JSON.stringify({ email, password }),
     });
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Failed to sign in');
-    }
-    return response.json();
+    return handleResponse(response);
   },
 
   async register(name: string, email: string, password: string): Promise<AuthResponse> {
@@ -68,11 +73,7 @@ export const api = {
       },
       body: JSON.stringify({ name, email, password }),
     });
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Failed to register');
-    }
-    return response.json();
+    return handleResponse(response);
   },
 
   async getProfile(token: string) {
@@ -81,10 +82,7 @@ export const api = {
         'Authorization': `Bearer ${token}`,
       },
     });
-    if (!response.ok) {
-      throw new Error('Failed to fetch profile');
-    }
-    return response.json();
+    return handleResponse(response);
   },
 
   async updateProfile(token: string, data: { name?: string; email?: string }) {
@@ -96,31 +94,20 @@ export const api = {
       },
       body: JSON.stringify(data),
     });
-    if (!response.ok) {
-      throw new Error('Failed to update profile');
-    }
-    return response.json();
+    return handleResponse(response);
   },
 
-  // Get all stories
+  // Story-related functions
   async getStories(): Promise<Story[]> {
     const response = await fetch(`${API_URL}/stories`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch stories');
-    }
-    return response.json();
+    return handleResponse(response);
   },
 
-  // Get a single story
   async getStory(id: string): Promise<Story> {
     const response = await fetch(`${API_URL}/stories/${id}`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch story');
-    }
-    return response.json();
+    return handleResponse(response);
   },
 
-  // Create a new story
   async createStory(story: Omit<Story, '_id' | 'createdAt' | 'updatedAt'>): Promise<Story> {
     const response = await fetch(`${API_URL}/stories`, {
       method: 'POST',
@@ -129,13 +116,9 @@ export const api = {
       },
       body: JSON.stringify(story),
     });
-    if (!response.ok) {
-      throw new Error('Failed to create story');
-    }
-    return response.json();
+    return handleResponse(response);
   },
 
-  // Update a story
   async updateStory(id: string, story: Partial<Story>): Promise<Story> {
     const response = await fetch(`${API_URL}/stories/${id}`, {
       method: 'PUT',
@@ -144,19 +127,16 @@ export const api = {
       },
       body: JSON.stringify(story),
     });
-    if (!response.ok) {
-      throw new Error('Failed to update story');
-    }
-    return response.json();
+    return handleResponse(response);
   },
 
-  // Delete a story
   async deleteStory(id: string): Promise<void> {
     const response = await fetch(`${API_URL}/stories/${id}`, {
       method: 'DELETE',
     });
     if (!response.ok) {
-      throw new Error('Failed to delete story');
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || 'Failed to delete story');
     }
   },
 
@@ -167,10 +147,7 @@ export const api = {
         'Authorization': `Bearer ${token}`,
       },
     });
-    if (!response.ok) {
-      throw new Error('Failed to fetch animations');
-    }
-    return response.json();
+    return handleResponse(response);
   },
 
   async getAnimation(id: string, token: string): Promise<Animation> {
@@ -179,10 +156,7 @@ export const api = {
         'Authorization': `Bearer ${token}`,
       },
     });
-    if (!response.ok) {
-      throw new Error('Failed to fetch animation');
-    }
-    return response.json();
+    return handleResponse(response);
   },
 
   async createAnimation(animation: Omit<Animation, '_id' | 'createdAt' | 'updatedAt'>, token: string): Promise<Animation> {
@@ -194,10 +168,7 @@ export const api = {
       },
       body: JSON.stringify(animation),
     });
-    if (!response.ok) {
-      throw new Error('Failed to create animation');
-    }
-    return response.json();
+    return handleResponse(response);
   },
 
   async updateAnimation(id: string, animation: Partial<Animation>, token: string): Promise<Animation> {
@@ -209,10 +180,7 @@ export const api = {
       },
       body: JSON.stringify(animation),
     });
-    if (!response.ok) {
-      throw new Error('Failed to update animation');
-    }
-    return response.json();
+    return handleResponse(response);
   },
 
   async deleteAnimation(id: string, token: string): Promise<void> {
@@ -223,7 +191,8 @@ export const api = {
       },
     });
     if (!response.ok) {
-      throw new Error('Failed to delete animation');
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || 'Failed to delete animation');
     }
   },
 };

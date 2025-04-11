@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { api, Animation } from '@/lib/api';
 import { Loader2, Plus, Film, AlertCircle } from "lucide-react";
 
@@ -12,7 +12,6 @@ const Dashboard = () => {
   const [token, setToken] = useState<string | null>(null);
   const [user, setUser] = useState<any>(null);
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
@@ -41,11 +40,7 @@ const Dashboard = () => {
       setAnimations(data);
     } catch (error) {
       console.error('Error fetching animations:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to load animations.",
-      });
+      toast.error("Failed to load animations.");
     } finally {
       setLoading(false);
     }

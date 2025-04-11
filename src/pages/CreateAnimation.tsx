@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { api } from '@/lib/api';
 
 const CreateAnimation = () => {
@@ -16,7 +16,6 @@ const CreateAnimation = () => {
   const [token, setToken] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   // Check if user is authenticated
   useEffect(() => {
@@ -30,9 +29,11 @@ const CreateAnimation = () => {
         setUserId(user.id);
       } catch (error) {
         console.error('Failed to parse user data', error);
+        toast.error('Authentication error. Please sign in again.');
         navigate('/signin');
       }
     } else {
+      toast.error('You must be logged in to create animations.');
       navigate('/signin');
     }
   }, [navigate]);
@@ -41,11 +42,7 @@ const CreateAnimation = () => {
     e.preventDefault();
     
     if (!token || !userId) {
-      toast({
-        variant: "destructive",
-        title: "Authentication Error",
-        description: "You must be logged in to create animations.",
-      });
+      toast.error('You must be logged in to create animations.');
       navigate('/signin');
       return;
     }
@@ -61,19 +58,12 @@ const CreateAnimation = () => {
         status: 'pending'
       }, token);
 
-      toast({
-        title: "Success",
-        description: "Animation created successfully! It will be processed shortly.",
-      });
+      toast.success('Animation created successfully! It will be processed shortly.');
 
       // Navigate to the animation details page
       navigate(`/animations/${animation._id}`);
     } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to create animation.",
-      });
+      toast.error(error instanceof Error ? error.message : "Failed to create animation.");
     } finally {
       setLoading(false);
     }
